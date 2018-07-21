@@ -1,0 +1,136 @@
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+
+import java.awt.Font;
+
+import javax.swing.JTextArea;
+import javax.swing.JButton;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+
+/**
+ * class that outputs the users score and high scores
+ * @author 96017die
+ *
+ */
+public class ScoreBoard {
+
+	private JFrame frmEnemyDestroyersHigh; // scores frame
+	private ArrayList<Long> scores; //arraylist of highscores
+	private long pScore; //players score
+	private String pName; //players name
+	private Scores scrs; //Scores object that gets scores from file
+	
+	/**
+	 * starts the scoring frame 
+	 */
+	public void start() {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ScoreBoard window = new ScoreBoard(pName, pScore);
+					window.frmEnemyDestroyersHigh.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public ScoreBoard(String pName, long pScore) {
+		this.pName = pName;
+		this.pScore = pScore;
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		scrs = new Scores(pScore, pName); //initializes scoring object
+		
+		frmEnemyDestroyersHigh = new JFrame();
+		frmEnemyDestroyersHigh.setTitle("ENEMY DESTROYERS HIGH SCORES");
+		frmEnemyDestroyersHigh.setBounds(100, 100, 484, 300);
+		frmEnemyDestroyersHigh.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmEnemyDestroyersHigh.getContentPane().setLayout(null);
+		
+		JLabel lblHighscores = new JLabel("High Scores");
+		lblHighscores.setFont(new Font("Castellar", Font.BOLD, 18));
+		lblHighscores.setHorizontalAlignment(SwingConstants.CENTER);
+		lblHighscores.setBounds(10, 25, 226, 20);
+		frmEnemyDestroyersHigh.getContentPane().add(lblHighscores);
+		
+		JTextArea txtScores = new JTextArea();
+		txtScores.setEditable(false);
+		txtScores.setBounds(29, 56, 208, 146);
+		frmEnemyDestroyersHigh.getContentPane().add(txtScores);
+		
+		JButton btnExit = new JButton("Exit");
+		btnExit.setFont(new Font("Castellar", Font.PLAIN, 14));
+		btnExit.addActionListener(new ActionListener() {
+			/**
+			 * exits the game
+			 */
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		btnExit.setBounds(306, 215, 89, 36);
+		frmEnemyDestroyersHigh.getContentPane().add(btnExit);
+		
+		JButton btnNewButton = new JButton("Display High Scores");
+		btnNewButton.setFont(new Font("Castellar", Font.PLAIN, 12));
+		btnNewButton.addActionListener(new ActionListener() {
+			
+			/**
+			 * displays high scores to the text box
+			 */
+			public void actionPerformed(ActionEvent e) {
+				txtScores.setText(""); //resets the text
+				scores = scrs.getList(); //retrieves list of friends
+				java.util.Iterator<Long> it = scores.iterator(); //defines friends iterator to access list
+
+				/**
+				 * displays list of friends to the text box
+				 */
+				while (it.hasNext()){ 
+					txtScores.append(it.next() +"\n");
+				}
+			}
+		});
+		btnNewButton.setBounds(39, 213, 186, 38);
+		frmEnemyDestroyersHigh.getContentPane().add(btnNewButton);
+		
+		JLabel lblPScore = new JLabel(pName + "'s Score");
+		lblPScore.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPScore.setFont(new Font("Castellar", Font.BOLD, 18));
+		lblPScore.setBounds(246, 25, 201, 20);
+		frmEnemyDestroyersHigh.getContentPane().add(lblPScore);
+		
+		JLabel txtPScore = new JLabel();
+		txtPScore.setVerticalAlignment(SwingConstants.TOP);
+		txtPScore.setBounds(268, 56, 152, 146);
+		/**
+		 * displays your score to the screen
+		 */
+		if (pScore ==0){
+			txtPScore.setText("You lost! Your score is 0.");
+		}
+		else txtPScore.setText("Congratualations! Your score is " + pScore +"!");		
+		frmEnemyDestroyersHigh.getContentPane().add(txtPScore);
+		
+	}
+	
+
+}

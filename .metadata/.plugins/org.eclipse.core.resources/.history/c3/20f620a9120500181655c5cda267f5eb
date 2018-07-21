@@ -1,0 +1,101 @@
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+
+import java.awt.Font;
+
+import javax.swing.JTextArea;
+import javax.swing.JButton;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+
+
+public class ScoreBoard {
+
+	private JFrame frame;
+	private ArrayList<Long> scores;
+	private long pScore;
+	private String pName;
+	private Scores scrs;
+	 
+	public void start() {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ScoreBoard window = new ScoreBoard(pName, pScore);
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public ScoreBoard(String pName, long pScore) {
+		this.pName = pName;
+		this.pScore = pScore;
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		scrs = new Scores(pScore, pName);
+		
+		
+		frame = new JFrame();
+		frame.setBounds(100, 100, 484, 300);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		JLabel lblHighscores = new JLabel("High Scores");
+		lblHighscores.setFont(new Font("Tahoma", Font.BOLD, 16));
+		lblHighscores.setHorizontalAlignment(SwingConstants.CENTER);
+		lblHighscores.setBounds(70, 25, 134, 20);
+		frame.getContentPane().add(lblHighscores);
+		
+		JTextArea txtScores = new JTextArea();
+		txtScores.setBounds(29, 56, 226, 165);
+		frame.getContentPane().add(txtScores);
+		
+		JButton btnNewButton = new JButton("Display High Scores");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				txtScores.setText(""); //resets the text
+				scores = scrs.getList(); //retrieves list of friends
+				java.util.Iterator<Long> it = scores.iterator(); //defines friends iterator to access list
+
+				/**
+				 * displays list of friends to the text box
+				 */
+				while (it.hasNext()){ 
+					txtScores.append(it.next() +"\n");
+				}
+			}
+		});
+		btnNewButton.setBounds(58, 228, 167, 23);
+		frame.getContentPane().add(btnNewButton);
+		
+		JLabel lblPScore = new JLabel(pName + "'s Score");
+		lblPScore.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPScore.setFont(new Font("Tahoma", Font.BOLD, 16));
+		lblPScore.setBounds(279, 25, 134, 20);
+		frame.getContentPane().add(lblPScore);
+		
+		JLabel txtPScore = new JLabel();
+		txtPScore.setBounds(316, 56, 104, 45);
+		txtPScore.setText(pScore +"");
+		frame.getContentPane().add(txtPScore);
+		
+	}
+}

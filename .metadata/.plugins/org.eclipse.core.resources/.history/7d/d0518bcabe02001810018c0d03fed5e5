@@ -1,0 +1,75 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
+
+/**
+ * High Score Class that records the scores
+ */
+
+/**
+ * @author 96017die
+ *
+ */
+public class Scores {
+
+	private ArrayList<Integer> scores;
+	private int plSc;
+	private String plNm;
+	private File f;
+	private PrintWriter pw;
+
+	public Scores(int plSc, String plNm){
+		this.plSc = plSc;
+		this.plNm = plNm;
+		int temp; // temporary variable for inputting scores
+		scores = new ArrayList<Integer>(); //defines array list of top scores
+		try {
+
+			f = new File("HighScores.txt");
+
+			pw = new PrintWriter(f);
+			pw.println(plSc);
+			pw.close();
+
+			Scanner sc = new Scanner(f); //creates scanner to read through the file
+
+			/**
+			 * adds scores from file to the list
+			 */
+			while (sc.hasNext()){
+				temp = sc.nextInt();
+				scores.add(temp);
+			}
+			sc.close();
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * adds score to list
+	 * @param sc - players score to add
+	 */
+	public void add(){
+		scores.add(plSc);
+		Collections.sort(scores); 
+	}
+
+	public void display(){
+		for (int i = 0; i<scores.size(); i++){
+
+		}
+	}
+
+	public ArrayList<Integer> getList(){
+		return scores;
+	}
+
+
+}
+

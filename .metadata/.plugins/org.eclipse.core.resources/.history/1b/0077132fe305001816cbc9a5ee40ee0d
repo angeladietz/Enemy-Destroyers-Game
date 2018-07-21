@@ -1,0 +1,323 @@
+import java.awt.Container;
+import java.awt.EventQueue;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.geom.Area;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.Timer;
+import java.awt.Font;
+
+/**
+ * main class with times and listeners for movement
+ * @author 96017die
+ *
+ */
+public class GameScreen {
+
+	private JFrame Gframe; // game frame
+	private JLabel user; // user label image
+	private JLabel lblPScore; //displays updating player score
+	private ArrayList<enemyAbstraction> enemies; //list of all enemies
+	public CharAbstraction u; //the user object
+	private int uV; //user value that defines which character a user is
+	private Timer t; //timer for shooting and enemy movement
+	private Timer aT;
+	private ArrayList<Shooter> bShooter; //arraylist ofshooters so theuser can shoot repeatedly
+	private ArrayList <JLabel> bullets; //arraylist of bullets for the user to shoot
+	private ImageIcon iiB; //image for bullets
+	private JLabel bullet; //bullet for user to shoot
+	private int enSpeed; //horizantal enemy speed
+	Shooter sh; //shooter object
+	private int nBullets; //number of bullets that have been shot
+	private double score; //initial score that will decrease as the game is played
+	private String pName; //player's name
+	private JOptionPane end;
+
+	public void start() {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					GameScreen window = new GameScreen(uV, pName);
+					window.Gframe.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public GameScreen(int userV, String pName) {
+		uV = userV;
+		this.pName = pName;
+		enSpeed = 4;
+		initialize();
+
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		Gframe = new JFrame();
+		Gframe.setTitle("ENEMY DESTROYERS");
+		Gframe.setSize(800, 600);
+		Gframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		Gframe.getContentPane().setLayout(null);
+
+		enemies = new <enemyAbstraction>ArrayList();
+		score = 200;
+
+		ImageIcon ii = new ImageIcon("lightBlue.png");
+		user = new JLabel(ii);
+
+		/**
+		 * sets the character according to the one selected by the user
+		 */
+		if(uV==1){
+			u = new Char1(user);
+		}
+		else if(uV==2){
+			u= new Char2(user);
+		}
+		else{
+			u=new Char3(user);
+		}
+		System.out.println(uV);
+		user.setIcon(u.getII());
+
+		/**
+		 * defines new enemies and adds them to the screen
+		 */
+		for (int i=0; i<7; i++){
+			enemies.add(new Enemy1(new JLabel(ii)));
+			enemies.get(i).getLabel().setBounds(10 + (90*i), 100, enemies.get(i).getLength(), 50);
+			Gframe.getContentPane().add(enemies.get(i).getLabel());
+		}
+
+		//  sets the size of the user and adds it to the frame
+		user.setBounds(220, 400, u.getLength(), 14);
+		Gframe.getContentPane().add(user);
+
+		JLabel lblScore = new JLabel("Score:");
+		lblScore.setFont(new Font("Castellar", Font.BOLD, 20));
+		lblScore.setBounds(31, 511, 96, 14);
+		Gframe.getContentPane().add(lblScore);
+
+		lblPScore = new JLabel(score + "");
+		lblPScore.setFont(new Font("Castellar", Font.BOLD, 20));
+		lblPScore.setBounds(137, 511, 67, 14);
+		Gframe.getContentPane().add(lblPScore);
+
+		Gframe.addKeyListener(new KListener());
+
+		//e1.Attack;
+		t = new Timer(200, new actTimer()); //define ghost movement at 200ms interval
+		t.start(); //start timer
+
+		aT = new Timer(50, new actTimer2()); //define ENEMY movement at 5ms interval
+		aT.start(); //start timer
+
+		bullets = new ArrayList<JLabel>(); 
+		bShooter = new ArrayList<Shooter>();
+		nBullets=0;
+	}
+
+	/**
+	 * ends the game
+	 * @param score - users score
+	 */
+	public void endGame(double score){
+		//end.showMessageDialog(null,"GAME OVER");
+		t.stop();
+		Gframe.setVisible(false);
+		ScoreBoard sb = new ScoreBoard(pName, Math.round(score));
+		sb.start();
+	}
+
+	/**
+	 * determines if two Labels intersect
+	 * @param testa - first JLabel being tested
+	 * @param testb - second label being tested
+	 * @return - if the two labels are intersecting
+	 */
+	public boolean intersects(JLabel testa, JLabel testb){
+		Area areaA = new Area(testa.getBounds());
+		Area areaB = new Area(testb.getBounds());
+
+		if (areaA.intersects(areaB.getBounds2D())){
+			return true;
+		}	
+		return false;
+	}
+
+	/**
+	 * timer for movement of enemies and scoring
+	 * @author 96017die
+	 *
+	 */
+	private class actTimer implements ActionListener{
+
+		/**
+		 * enemy actions
+		 * timer for keeping track of score
+		 */
+		public void actionPerformed(ActionEvent e) {//actions done on timer for enemy
+
+			score -= 0.5;
+
+			/**
+			 * ends the game if the score is less than zero
+			 */
+			if (score<0){
+				endGame(0);
+			}
+
+			/**
+			 * movement of enemies
+			 */
+			for (int i = 0; i<enemies.size(); i++){
+				int x = enemies.get(i).getLabel().getX();
+				int y = enemies.get(i).getLabel().getY();
+
+				enemies.get(i).getLabel().setLocation(x + enSpeed, y); //adds their speed to their x coordinate
+
+
+				/**
+				 * reverses the enemies direction if they reach the bounds	
+				 */
+				if (enemies.get(enemies.size()-1).getLabel().getX()>=(780-enemies.get(0).getLength())){
+					enSpeed = -5;
+				}
+				else if (enemies.get(0).getLabel().getX()<= 0){
+					enSpeed = 5;
+					enemies.get(0).getLabel().setLocation(x + enSpeed, y);
+				}
+			}
+
+			/**
+			 * if the enemy is below the user they will go back to the top
+			 */
+			for (int i = 0; i<enemies.size(); i++){
+				if (u.getLabel().getY()<=enemies.get(i).getLabel().getY()+50){
+					if (intersects(user, enemies.get(i).getLabel())==true){
+						t.stop();
+						aT.stop();
+						user.setVisible(false);
+						endGame(0);
+					}
+					else enemies.get(i).moveBack();
+				}
+			}
+
+			/**
+			 * determines if an enemy intersects with a bullet
+			 */
+			for (int i=0; i<bShooter.size(); i++){
+				for (int j=0;j<enemies.size(); j++){
+					if (intersects(bullets.get(i), enemies.get(j).getLabel())){
+						bullets.get(i).setVisible(false);
+						bullets.get(i).setLocation(-10,-10);
+						enemies.get(j).lostLife(); //subtracts 1 from the number of lives
+						enemies.get(j).setImage();
+						if (enemies.get(j).getLives()==0){ //removes the enemy if it has been killed
+							enemies.get(j).getLabel().setVisible(false);
+							enemies.remove(j);}
+						if (enemies.size() == 0){
+							endGame(score); //games ends and the user won
+						}
+					}}
+			}
+			lblPScore.setText(Math.round(score) +""); //displays current score
+		}
+	}
+
+	/**
+	 * timer for enemy attack
+	 * @author 96017die
+	 */
+	private class actTimer2 implements ActionListener{
+		public void actionPerformed(ActionEvent e) {//actions done on timer for enemy
+
+			int rC = (int)Math.floor((Math.random()*(enemies.size()))); //generates a random number to move a random enemy down
+
+			enemies.get(rC).Attack(); //gets the random enemy and moves it down
+		}
+	}
+
+	/**
+	 * methods that respond to user key input
+	 * @author 96017die
+	 */
+	private class KListener implements KeyListener{
+		public void keyPressed(KeyEvent e){
+
+			iiB = new ImageIcon("bullet.png");
+
+			/**
+			 * gets position of user
+			 */
+			int X = u.getx();
+			int Y = u.gety();
+
+			int speed = u.getSpeed();
+
+
+			/** moves the player right if the right arrow is pressed*/
+			if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+				if(!(X>780-u.getLength())){
+					u.moveR();}}
+
+
+			/** moves the player left if the left arrow is pressed*/
+			else if (e.getKeyCode() == KeyEvent.VK_LEFT){
+				if (X>0){
+					u.moveL();
+				}
+			}
+
+			/**
+			 * shooting mechanism
+			 */
+			if (e.getKeyCode() == KeyEvent.VK_UP){
+
+				bullets.add(new JLabel(iiB));  //adds bullet image
+				bShooter.add(new Shooter(u,bullets.get(nBullets))); //adds bullet functionality
+
+				bullets.get(nBullets).setBounds(u.getx(), u.gety(), 7, 9); //sets the bounds of the new bullet
+				Gframe.getContentPane().add(bullets.get(nBullets)); //adds the new bullet to the screen
+				bShooter.get(nBullets).shoot(); //moves the bullet up
+
+				nBullets+=1; //counts the number of bullets
+				score -= 2; //subtracts from the score
+
+				/**
+				 * ends the game if the score is less than zero
+				 */
+				if (score<0){
+					endGame(0);
+				}
+			}
+		}
+
+		public void keyTyped(KeyEvent e){
+			System.out.print(e.getKeyChar());
+		}
+		public void keyReleased(KeyEvent e){}
+	}	
+}
+
+

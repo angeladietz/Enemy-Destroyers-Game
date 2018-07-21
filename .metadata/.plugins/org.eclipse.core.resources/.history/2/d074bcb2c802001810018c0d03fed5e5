@@ -1,0 +1,160 @@
+import java.awt.EventQueue;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JRadioButton;
+
+import java.awt.Font;
+
+import javax.swing.SwingConstants;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JPanel;
+
+
+public class StartScreen {
+
+	private JFrame frame;
+	private JTextField txtPName;
+	private JOptionPane Instructions;
+	private int userV=4;
+	private JRadioButton radC1;
+	private JRadioButton radC2;
+	private JRadioButton radC3;
+	private ButtonGroup bG;
+	private String pName;
+	
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					StartScreen window = new StartScreen();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public StartScreen() {
+		initialize();
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 450, 300);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+
+		txtPName = new JTextField();
+		txtPName.setBounds(214, 91, 119, 20);
+		frame.getContentPane().add(txtPName);
+		txtPName.setColumns(10);
+
+		JLabel lblEnterName = new JLabel("Enter Name:");
+		lblEnterName.setBounds(136, 94, 84, 14);
+		frame.getContentPane().add(lblEnterName);
+
+		JButton btnStart = new JButton("Start");
+		btnStart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//	JFrame Gframe = new JFrame();
+				//Gframe.setVisible(true);
+				//	Gframe.setBounds(100, 100, 680, 526);
+				//	Gframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				//	Gframe.getContentPane().setLayout(null);
+
+				pName = txtPName.getText();
+				
+				if (radC1.isSelected()){
+					userV=1;
+				}
+				else if(radC2.isSelected()){
+					userV=2;
+				}
+				else{
+					userV=3;
+				}
+				System.out.println(userV);
+				
+				GameScreen gs = new GameScreen(userV, pName);
+				gs.start();
+
+			}
+		});
+		btnStart.setBounds(45, 204, 89, 23);
+		frame.getContentPane().add(btnStart);
+		btnStart.setEnabled(false);
+		if (txtPName.getText() != ""){
+			//btnStart.setEnabled(true);
+		}
+
+		JButton btnInstructions = new JButton("instructions");
+		btnInstructions.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Instructions.showMessageDialog(null,"These are game instructions that i won't type right now they'll be added later");
+			}
+		});
+		btnInstructions.setBounds(172, 204, 89, 23);
+		frame.getContentPane().add(btnInstructions);
+
+		JButton btnExit = new JButton("Exit");
+		btnExit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+		btnExit.setBounds(287, 204, 89, 23);
+		frame.getContentPane().add(btnExit);
+
+		radC1 = new JRadioButton("C1");
+		radC1.setSelected(true);
+		radC1.setBounds(151, 147, 58, 23);
+		frame.getContentPane().add(radC1);
+
+		radC2 = new JRadioButton("C2");
+		radC2.setBounds(212, 147, 58, 23);
+		frame.getContentPane().add(radC2);
+
+		radC3 = new JRadioButton("C3");
+		radC3.setBounds(272, 147, 44, 23);
+		frame.getContentPane().add(radC3);
+
+		JLabel lblChar = new JLabel("Character Select:");
+		lblChar.setBounds(123, 126, 135, 14);
+		frame.getContentPane().add(lblChar);
+
+		JLabel lblTitle = new JLabel("EPIC Title");
+		lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTitle.setFont(new Font("Tahoma", Font.PLAIN, 43));
+		lblTitle.setBounds(53, 21, 371, 59);
+		frame.getContentPane().add(lblTitle);
+
+		bG=new ButtonGroup();
+		bG.add(radC1);
+		bG.add(radC2);
+		bG.add(radC3);
+
+
+
+
+	}
+	public int getuV(){
+		return userV;
+	}
+}

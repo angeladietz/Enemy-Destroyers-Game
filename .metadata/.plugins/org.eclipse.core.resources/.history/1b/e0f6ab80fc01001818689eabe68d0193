@@ -1,0 +1,52 @@
+
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+
+
+public class Enemy1 extends enemyAbstraction{
+
+	private JLabel enemy;	
+	
+	public Enemy1(JLabel eL) {
+		super(eL);
+		enemy = eL;
+	}
+
+	private int speed = 5; //character's speed
+	private int length = 100; //length of character
+	
+	ImageIcon ii = new ImageIcon("e1.png");
+
+	public int getSpeed() {
+		// TODO Auto-generated method stub
+		return speed;
+	}
+
+	public void Attack() {
+		// TODO Auto-generated method stub
+		
+		
+			moveD();
+		
+	}
+	
+	
+	/**
+	 * @return - enemy JLabel
+	 */
+	public JLabel getLabel(){
+		return enemy;
+	}
+
+	public ImageIcon getII() {
+		// TODO Auto-generated method stub
+		return ii;
+	}
+
+	@Override
+	public int getLength() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+}
