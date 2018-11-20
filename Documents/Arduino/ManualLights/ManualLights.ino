@@ -23,7 +23,6 @@ void setup() {
 }
 
 
-
 void loop() {
   buttonStateR = digitalRead(buttonPinR);
   buttonStateB = digitalRead(buttonPinB);
